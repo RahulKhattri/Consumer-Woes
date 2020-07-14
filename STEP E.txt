@@ -1,0 +1,17 @@
+STEPS:
+
+1. register /usr/lib/pig/piggybank.jar
+2. define CSVExcelStorage org.apache.pig.piggybank.storage.CSVExcelStorage;
+3. a= load '/home/cloudera/Desktop/Consumer_Complaints.csv' using CSVExcelStorage();
+4. dat1= filter a by (($3 is NOT NULL) AND ($14 is NOT NULL));
+5. dat= foreach dat1 generate(chararray)$3 as Issue,(chararray)$14 as CoResp;
+6. gpissue= group dat by Issue;
+7. issuecount= foreach gpissue generate group,COUNT(dat);
+//User Defined Threshhold
+8. flt= filter issuecount by $1 > 14000;
+9. lot= foreach flt generate $0 as name;
+10.jn= JOIN lot by name, dat by Issue;
+11.jndat= foreach jn generate $0 as Issue, $2 as CoResp;
+12.gp= group jndat by (Issue,CoResp);
+13.final= foreach gp generate group,COUNT(jndat);
+14.store final into '/home/cloudera/Desktop/ra5';

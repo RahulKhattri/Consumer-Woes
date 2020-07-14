@@ -1,0 +1,12 @@
+STEPS:
+
+1. register /usr/lib/pig/piggybank.jar
+2. register /home/cloudera/Desktop/pigu.jar
+3. define CSVExcelStorage org.apache.pig.piggybank.storage.CSVExcelStorage;
+4. a= load '/home/cloudera/Desktop/Consumer_Complaints.csv' using CSVExcelStorage();
+5. dat1 = foreach a generate (chararray)$3 as Issue,(chararray)$8 as State;
+6. dat2= filter dat1 by State is NOT NULL;
+7. dat = filter dat2 by pigudf.Filter(State);
+8. gpst= group dat by State ;
+9. stateissue= foreach gpst generate group,COUNT(dat.Issue);
+10.store stateissue into '/home/cloudera/Desktop/ra1';
